@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The 3I/ATLAS Paradox - AVRA's Debrief</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Rajdhani:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'comic-black': '#0a0a0a',
+                        'comic-dark': '#1a1a1a',
+                        'comic-purple': '#a855f7',
+                        'comic-pink': '#d946ef',
+                        'comic-accent': '#22d3ee',
+                        'comic-paper': '#f5f5f5',
+                        'comic-alert': '#ef4444',
+                    },
+                    fontFamily: {
+                        'display': ['Bangers', 'cursive'],
+                        'body': ['Rajdhani', 'sans-serif'],
+                    },
+                    backgroundImage: {
+                        'halftone': 'radial-gradient(circle, #333 1px, transparent 1px)',
+                    },
+                    boxShadow: {
+                        'comic': '8px 8px 0px 0px rgba(168, 85, 247, 1)',
+                        'comic-hover': '4px 4px 0px 0px rgba(217, 70, 239, 1)',
+                        'panel': '0 0 0 2px #fff, 0 0 20px rgba(168, 85, 247, 0.3)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Halftone Background Pattern */
+        .bg-halftone-pattern {
+            background-size: 20px 20px;
+            background-image: radial-gradient(circle, #ffffff10 1px, transparent 1px);
+        }
+
+        /* Glitch Effect for Titles */
+        .glitch-text {
+            position: relative;
+        }
+
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch-text::before {
+            left: 2px;
+            text-shadow: -1px 0 #ff00c1;
+            clip-path: inset(44% 0 61% 0);
+            animation: glitch-anim-1 2s infinite linear alternate-reverse;
+        }
+
+        .glitch-text::after {
+            left: -2px;
+            text-shadow: -1px 0 #00fff9;
+            clip-path: inset(54% 0 10% 0);
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim-1 {
+            0% {
+                clip-path: inset(20% 0 80% 0);
+            }
+
+            20% {
+                clip-path: inset(60% 0 10% 0);
+            }
+
+            40% {
+                clip-path: inset(40% 0 50% 0);
+            }
+
+            60% {
+                clip-path: inset(80% 0 5% 0);
+            }
+
+            80% {
+                clip-path: inset(10% 0 60% 0);
+            }
+
+            100% {
+                clip-path: inset(30% 0 40% 0);
+            }
+        }
+
+        @keyframes glitch-anim-2 {
+            0% {
+                clip-path: inset(10% 0 60% 0);
+            }
+
+            20% {
+                clip-path: inset(30% 0 20% 0);
+            }
+
+            40% {
+                clip-path: inset(70% 0 10% 0);
+            }
+
+            60% {
+                clip-path: inset(20% 0 50% 0);
+            }
+
+            80% {
+                clip-path: inset(50% 0 30% 0);
+            }
+
+            100% {
+                clip-path: inset(0% 0 80% 0);
+            }
+        }
+
+        /* Comic Panel Borders */
+        .comic-panel {
+            clip-path: polygon(0% 0%,
+                    100% 0%,
+                    100% 100%,
+                    0% 100%);
+            transition: all 0.3s ease;
+        }
+
+        .comic-panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.4);
+            z-index: 10;
+        }
+
+        /* Speech Bubble Tail */
+        .speech-tail::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 20px;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            transform: rotate(45deg);
+            border-bottom: 2px solid #000;
+            border-right: 2px solid #000;
+        }
+
+        /* Reverse Speech Tail (for left side) */
+        .speech-tail-left::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 20px;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            transform: rotate(-45deg);
+            border-bottom: 2px solid #000;
+            border-left: 2px solid #000;
+        }
+
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Comic Carousel Styles */
+        .comic-slide {
+            display: none;
+            position: relative;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .comic-slide.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Page Indicators */
+        .page-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #4a5568;
+            border: 2px solid #fff;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .page-indicator:hover {
+            background-color: #d946ef;
+            transform: scale(1.2);
+        }
+
+        .page-indicator.active {
+            background-color: #a855f7;
+            width: 32px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+
+<body class="bg-comic-black text-white font-body overflow-x-hidden selection:bg-comic-purple selection:text-white">
+
+    <!-- Fixed Background Elements -->
+    <div class="fixed inset-0 pointer-events-none z-0 bg-halftone-pattern opacity-20"></div>
+    <div class="fixed top-0 left-0 w-full h-1 bg-gradient-to-r from-comic-purple via-comic-pink to-comic-accent z-50">
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-40 bg-comic-black/90 backdrop-blur-md border-b border-white/10">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-3xl font-display tracking-wider text-white">
+                <span class="text-comic-purple">3I/</span><span class="text-white">ATLAS</span>
+            </div>
+            <div class="hidden md:flex space-x-8 font-bold uppercase tracking-widest text-sm">
+                <a href="#debrief" class="hover:text-comic-pink transition-colors">AVRA's Debrief</a>
+                <a href="#evidence" class="hover:text-comic-accent transition-colors">Evidence</a>
+                <a href="#analysis" class="hover:text-comic-purple transition-colors">Bayesian Analysis</a>
+                <a href="#protocol"
+                    class="px-6 py-2 bg-white text-black hover:bg-comic-purple hover:text-white transition-all transform hover:-rotate-1 font-bold">Protocol</a>
+            </div>
+            <button class="md:hidden text-2xl"><i class="fas fa-bars"></i></button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="relative min-h-[80vh] flex items-center pt-20 overflow-hidden">
+        <!-- Dynamic Comic Background Shapes -->
+        <div
+            class="absolute right-0 top-1/4 w-1/2 h-full bg-comic-purple/10 -skew-x-12 transform origin-bottom-right z-0">
+        </div>
+        <div class="absolute left-[-10%] bottom-[-10%] w-[40%] h-[40%] bg-comic-pink/10 rounded-full blur-[100px] z-0">
+        </div>
+
+        <div class="container mx-auto px-6 relative z-10 grid md:grid-cols-2 gap-12 items-center">
+            <div class="space-y-6">
+                <div
+                    class="inline-block px-4 py-1 border border-comic-alert text-comic-alert text-xs font-bold uppercase tracking-[0.3em] mb-4">
+                    MPC Alert: 2025-07-01
+                </div>
+                <h1 class="text-6xl md:text-8xl font-display leading-[0.9] text-white">
+                    THE PARADOX <br>
+                    <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-comic-purple to-comic-pink glitch-text"
+                        data-text="3I/ATLAS">3I/ATLAS</span>
+                </h1>
+                <p
+                    class="text-gray-400 text-lg md:text-xl max-w-lg leading-relaxed border-l-4 border-comic-purple pl-6">
+                    Hyperbolic excess velocity: <strong class="text-white">54.3 km/s</strong>. Perihelion: <strong
+                        class="text-white">1.36 AU</strong>.
+                    Anomalous non-gravitational acceleration detected.
+                </p>
+                <div class="flex gap-4 pt-4">
+                    <a href="#debrief"
+                        class="group relative px-8 py-4 bg-comic-purple text-white font-bold uppercase tracking-wider overflow-hidden">
+                        <span class="relative z-10 group-hover:text-black transition-colors">Start Briefing</span>
+                        <div
+                            class="absolute inset-0 bg-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-200 ease-out z-0">
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Hero Visual (AVRA) -->
+            <div class="relative hidden md:block">
+                <div
+                    class="relative z-10 border-4 border-white p-2 bg-comic-dark transform rotate-2 hover:rotate-0 transition-transform duration-500 shadow-comic">
+                    <img src="uploaded_image_0_1768328167349.jpg" alt="Agent AVRA"
+                        class="w-full h-auto transition-all duration-500">
+                </div>
+                <div
+                    class="absolute -bottom-4 -right-4 bg-comic-alert text-white px-6 py-2 font-display text-2xl rotate-3 border-2 border-white shadow-lg">
+                    ANOMALY!
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <section id="debrief" class="py-24 bg-zinc-900 border-y-4 border-white relative overflow-hidden">
+        <div
+            class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/black-scales.png')] opacity-30">
+        </div>
+
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+
+                <!-- AVRA Image -->
+                <div class="relative hidden md:block">
+                    <div
+                        class="relative z-10 border-4 border-white p-2 bg-comic-dark transform -rotate-2 hover:rotate-0 transition-transform duration-500 shadow-comic">
+                        <img src="avra_analyzing_data_clean_1768336992350.png" alt="Agent AVRA analyzing data"
+                            class="w-full h-auto transition-all duration-500">
+                    </div>
+                    <div
+                        class="absolute -bottom-4 -right-4 bg-comic-pink text-white px-6 py-2 font-display text-xl rotate-3 border-2 border-white shadow-lg">
+                        ANALYZING
+                    </div>
+                </div>
+
+                <!-- Dialogue / Explanation -->
+                <div class="w-full space-y-8 pt-4">
+                    <h2
+                        class="text-4xl font-display text-white mb-8 border-b-2 border-dashed border-gray-700 pb-4 inline-block">
+                        <i class="fas fa-terminal text-comic-pink mr-3"></i>DECODING THE ANOMALY
+                    </h2>
+
+                    <!-- Bubble 1: The Physics Problem -->
+                    <div
+                        class="relative bg-white text-black p-6 rounded-2xl shadow-[8px_8px_0px_#22d3ee] border-2 border-black speech-tail-left ml-4 md:ml-0">
+                        <h4 class="font-bold font-display text-xl text-comic-purple mb-2">THE PHYSICS DON'T ADD UP</h4>
+                        <p class="font-bold font-body text-lg leading-tight">
+                            "Listen closely. Physics is usually boring, but this? This is weird. We have an object made
+                            of CO₂ pushing itself with an acceleration of <span class="text-comic-alert">2.3 × 10⁻⁶
+                                m/s²</span>. That might sound small, but for a rock this size, it's like a bicycle
+                            keeping up with a Ferrari. Natural sublimation shouldn't be this strong."
+                        </p>
+                    </div>
+
+                    <!-- Bubble 2: The Composition Mystery -->
+                    <div
+                        class="relative bg-white text-black p-6 rounded-2xl shadow-[8px_8px_0px_#a855f7] border-2 border-black speech-tail-left ml-4 md:ml-0">
+                        <h4 class="font-bold font-display text-xl text-comic-purple mb-2">THE COMPOSITION MYSTERY</h4>
+                        <p class="font-bold font-body text-lg leading-tight">
+                            "The spectroscopy is wrong. Nickel-to-iron ratio at <span
+                                class="bg-black text-white px-1">6.8</span>—way above solar. CN/CO₂ at <span
+                                class="bg-black text-white px-1">432</span>. And those jets? Collimated at 28 degrees
+                            like they're coming from engineered nozzles, not random ice vents."
+                        </p>
+                    </div>
+
+                    <!-- Bubble 3: The Bayesian Trap -->
+                    <div
+                        class="relative bg-white text-black p-6 rounded-2xl shadow-[8px_8px_0px_#d946ef] border-2 border-black speech-tail-left ml-4 md:ml-0">
+                        <h4 class="font-bold font-display text-xl text-comic-pink mb-2">THE "BELIEF" FACTOR</h4>
+                        <p class="font-bold font-body text-lg leading-tight">
+                            "Here's the trick: Bayesian Math. If your 'Prior' (your starting belief in artifacts) is
+                            zero, the math forces a natural answer no matter what. But if you open your mind just a
+                            crack—say, <span class="bg-black text-white px-1">1%</span>—the probability of this being
+                            controlled jumps to <span class="text-comic-alert">25%</span>. Your bias decides the truth."
+                        </p>
+                    </div>
+
+                    <!-- Bubble 4: The Plan -->
+                    <div class="relative bg-zinc-800 text-white p-6 rounded-xl border-l-4 border-comic-accent mt-4">
+                        <p class="font-mono text-sm text-comic-accent mb-2">> TACTICAL RECOMMENDATION:</p>
+                        <p class="text-gray-300">
+                            "We can't guess. We need the <strong>Three-Phase Protocol</strong>:<br>
+                            <span class="text-comic-pink">1.</span> Watch the gas (Spectroscopy - 12 weeks).<br>
+                            <span class="text-comic-pink">2.</span> Watch the spin (Photometry - 24 weeks).<br>
+                            <span class="text-comic-pink">3.</span> Get a picture (VLT/SPHERE imaging).<br>
+                            If that fails? We send a probe in <span class="text-comic-accent font-bold">2027</span> to
+                            grab a piece of it."
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Evidence Board Section -->
+    <section id="evidence" class="py-20 bg-comic-dark relative border-t-4 border-black">
+        <div class="container mx-auto px-6">
+            <div class="flex justify-between items-end mb-16">
+                <div>
+                    <h2 class="text-5xl font-display text-white mb-2">Observational Data</h2>
+                    <div class="h-2 w-24 bg-comic-pink"></div>
+                </div>
+                <p class="hidden md:block text-right text-gray-500 font-mono text-sm">
+                    // SOURCE: HUXCLEY_ET_AL_2026<br>
+                    // CONFIDENCE: HIGH
+                </p>
+            </div>
+
+            <!-- Comic Grid Layout for Data -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]">
+
+                <!-- Panel 1: The Core Anomaly -->
+                <div
+                    class="md:col-span-2 relative group overflow-hidden border-4 border-white bg-black cursor-pointer comic-panel flex flex-col justify-between p-8">
+                    <!-- Background Image for Acceleration -->
+                    <div class="absolute inset-0 z-0">
+                        <img src="https://images.unsplash.com/photo-1506318137071-a8bcbf6d919d?q=80&w=1000&auto=format&fit=crop"
+                            class="w-full h-full object-cover opacity-20 grayscale" alt="Motion Data">
+                    </div>
+                    <div class="absolute inset-0 bg-halftone-pattern opacity-10 z-0"></div>
+
+                    <div class="relative z-10">
+                        <h3 class="text-3xl font-display text-comic-accent mb-4">The Acceleration Anomaly</h3>
+                        <div class="font-mono text-green-400 text-xl md:text-2xl mb-2">
+                            a_ng = (2.3 ± 0.7) × 10⁻⁶ m/s²
+                        </div>
+                        <p class="text-gray-300 max-w-lg text-sm">
+                            Magnitude exceeds upper limits of standard passive models (H_N). Observed at perihelion with
+                            30% uncertainty.
+                        </p>
+                    </div>
+                    <div class="mt-auto relative z-10">
+                        <div class="w-full bg-gray-800 h-4 rounded-full overflow-hidden border border-gray-600">
+                            <div class="bg-comic-alert h-full w-[85%] relative">
+                                <span class="absolute right-2 text-[10px] text-black font-bold leading-4">PASSIVE LIMIT
+                                    EXCEEDED</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        class="absolute top-4 right-4 bg-comic-alert text-black text-xs font-bold px-2 py-1 rotate-3 border border-white">
+                        CRITICAL</div>
+                </div>
+
+                <!-- Panel 2: Composition -->
+                <div
+                    class="relative group overflow-hidden border-4 border-white bg-zinc-900 cursor-pointer comic-panel p-0 flex flex-col items-center justify-center text-center hover:bg-zinc-800 transition-colors">
+                    <div class="absolute inset-0 z-0">
+                        <img src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=1000&auto=format&fit=crop"
+                            class="w-full h-full object-cover opacity-20 grayscale group-hover:opacity-40 transition-opacity"
+                            alt="Chemistry">
+                    </div>
+                    <div class="relative z-10 p-6">
+                        <i class="fas fa-atom text-5xl text-comic-purple mb-4"></i>
+                        <h4 class="font-display text-2xl mb-2">Composition</h4>
+                        <ul class="text-sm font-mono text-gray-300 space-y-2">
+                            <li><span class="text-comic-pink">CO₂/H₂O:</span> 8.2 ± 0.5</li>
+                            <li><span class="text-comic-pink">Ni/Fe:</span> 6.8 ± 1.2</li>
+                            <li><span class="text-comic-pink">CN/CO₂:</span> 432 ± 45</li>
+                        </ul>
+                        <p class="text-xs text-gray-500 mt-4">JWST/NIRSpec + VLT/X-SHOOTER</p>
+                    </div>
+                </div>
+
+                <!-- Panel 3: AVRA in Laboratory -->
+                <div
+                    class="relative group overflow-hidden border-4 border-white bg-black cursor-pointer comic-panel p-0">
+                    <img src="avra_laboratory_action_clean_1768337009229.png" alt="AVRA in Laboratory"
+                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4">
+                        <h4 class="font-display text-lg text-white">AVRA IN ACTION</h4>
+                        <p class="text-xs text-gray-400">High-tech Amazonian laboratory</p>
+                    </div>
+                </div>
+
+                <!-- Panel 4: Jets -->
+                <div
+                    class="md:col-span-2 relative group overflow-hidden border-4 border-white bg-black cursor-pointer comic-panel p-6 flex items-center">
+                    <div class="absolute inset-0 z-0">
+                        <img src="https://images.unsplash.com/photo-1464603642759-b86498175b22?q=80&w=1000&auto=format&fit=crop"
+                            class="w-full h-full object-cover opacity-20 grayscale group-hover:opacity-30 transition-opacity"
+                            alt="Atmosphere">
+                    </div>
+                    <div class="relative z-10 flex-1 pr-6">
+                        <h3 class="text-2xl font-display text-white mb-2">Jet Collimation</h3>
+                        <p class="text-gray-400 text-sm mb-4">
+                            Evidence of highly collimated jets (~28° FWHM).
+                            Specific cavities or <span class="text-comic-accent font-bold">artificial nozzles</span>?
+                        </p>
+                        <p class="text-xs font-mono text-gray-600">VLT/SPHERE Imaging</p>
+                    </div>
+                    <div
+                        class="relative z-10 w-32 h-32 border-2 border-dashed border-gray-600 rounded-full flex items-center justify-center">
+                        <div
+                            class="absolute w-1 h-24 bg-gradient-to-t from-comic-accent to-transparent transform rotate-45 origin-bottom">
+                        </div>
+                        <div
+                            class="absolute w-1 h-24 bg-gradient-to-t from-comic-accent to-transparent transform -rotate-45 origin-bottom">
+                        </div>
+                        <div class="w-4 h-4 bg-white rounded-full z-10"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bayesian Analysis Section -->
+    <section id="analysis" class="py-20 bg-black border-t-4 border-white relative overflow-hidden">
+        <div class="absolute inset-0 bg-halftone-pattern opacity-10 z-0"></div>
+
+        <div class="container mx-auto px-6 relative z-10">
+            <!-- AVRA Contemplating Image -->
+            <div class="max-w-3xl mx-auto mb-12">
+                <div class="relative border-4 border-white p-2 bg-comic-dark shadow-comic">
+                    <img src="avra_contemplating_hypotheses_clean_1768337026287.png" alt="AVRA contemplating hypotheses"
+                        class="w-full h-auto">
+                </div>
+            </div>
+
+            <div class="text-center mb-16">
+                <h2 class="text-5xl font-display text-white mb-4">The Bayesian Showdown</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">
+                    Two hypotheses enter. Your prior decides who leaves.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                <!-- H_N: Natural -->
+                <div
+                    class="border-4 border-comic-accent bg-zinc-900 p-8 relative group hover:scale-105 transition-transform">
+                    <div
+                        class="absolute -top-4 -left-4 bg-comic-accent text-black px-4 py-2 font-display text-2xl rotate-[-5deg] border-2 border-white">
+                        H_N
+                    </div>
+                    <h3 class="text-3xl font-display text-white mb-4 mt-4">Passive Natural</h3>
+                    <ul class="space-y-3 text-gray-300">
+                        <li class="flex items-start">
+                            <i class="fas fa-snowflake text-comic-accent mr-3 mt-1"></i>
+                            <span>CO₂-dominated cometesimal</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-sun text-comic-accent mr-3 mt-1"></i>
+                            <span>Solar-driven sublimation</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-mountain text-comic-accent mr-3 mt-1"></i>
+                            <span>Cavity-induced jet collimation</span>
+                        </li>
+                    </ul>
+                    <div class="mt-6 pt-6 border-t border-gray-700">
+                        <p class="text-sm text-gray-500 font-mono">
+                            Requires: Small nucleus (~100-200m) OR high production rate
+                        </p>
+                    </div>
+                </div>
+
+                <!-- H_A: Active -->
+                <div
+                    class="border-4 border-comic-pink bg-zinc-900 p-8 relative group hover:scale-105 transition-transform">
+                    <div
+                        class="absolute -top-4 -right-4 bg-comic-pink text-black px-4 py-2 font-display text-2xl rotate-[5deg] border-2 border-white">
+                        H_A
+                    </div>
+                    <h3 class="text-3xl font-display text-white mb-4 mt-4">Active Control</h3>
+                    <ul class="space-y-3 text-gray-300">
+                        <li class="flex items-start">
+                            <i class="fas fa-rocket text-comic-pink mr-3 mt-1"></i>
+                            <span>Controllable propulsion system</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-microchip text-comic-pink mr-3 mt-1"></i>
+                            <span>Sensor-actuation feedback loop</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-cog text-comic-pink mr-3 mt-1"></i>
+                            <span>Sustained maneuverability</span>
+                        </li>
+                    </ul>
+                    <div class="mt-6 pt-6 border-t border-gray-700">
+                        </p>
+                        <ul class="space-y-2 text-xs text-gray-500 font-mono">
+                            <li>• LCO 1-2m telescopes</li>
+                            <li>• V-band, 10 min cadence</li>
+                            <li>• Pole orientation analysis</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Phase 3 -->
+                <div
+                    class="bg-black border-4 border-white p-6 relative group hover:-translate-y-2 transition-transform">
+                    <div
+                        class="absolute -top-6 left-6 bg-comic-accent text-black px-6 py-2 font-display text-3xl border-2 border-white">
+                        03
+                    </div>
+                    <div class="mt-8">
+                        <h3 class="text-2xl font-display text-white mb-4">Imaging</h3>
+                        <p class="text-gray-400 text-sm mb-4">
+                            Direct imaging to measure nucleus size and jet morphology.
+                        </p>
+                        <ul class="space-y-2 text-xs text-gray-500 font-mono">
+                            <li>• VLT/SPHERE IFS</li>
+                            <li>• High-contrast imaging</li>
+                            <li>• Jet source localization</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sample Return Mission -->
+            <div class="mt-16 max-w-4xl mx-auto">
+                <div class="bg-comic-alert text-white p-8 border-4 border-white relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16">
+                    </div>
+                    <div class="relative z-10">
+                        <h3 class="text-3xl font-display mb-4">
+                            <i class="fas fa-space-shuttle mr-3"></i>
+                            Sample Return Mission
+                        </h3>
+                        <p class="text-lg mb-4">
+                            If Phases 1-3 remain ambiguous, direct compositional sampling becomes
+                            scientifically
+                            justified.
+                        </p>
+                        <div class="grid md:grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <p class="font-bold mb-1">Launch Window:</p>
+                                <p class="font-mono">2027</p>
+                            </div>
+                            <div>
+                                <p class="font-bold mb-1">Rendezvous:</p>
+                                <p class="font-mono">2029-2030</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Framework Strip -->
+    <div class="bg-comic-purple py-12 transform -skew-y-2 border-y-4 border-black relative z-20 overflow-hidden">
+        <div class="container mx-auto px-6 transform skew-y-2">
+            <div
+                class="flex flex-wrap justify-center gap-8 md:gap-16 text-black font-display text-xl md:text-3xl uppercase tracking-widest text-center">
+                <span class="hover:text-white transition-colors cursor-help" title="Natural Hypothesis">H_N: Natural
+                    Passive</span>
+                <span class="text-white hidden md:inline">VS</span>
+                <span class="hover:text-white transition-colors cursor-help" title="Active Control Hypothesis">H_A:
+                    Active Control</span>
+                <span class="text-white hidden md:inline">|</span>
+                <span class="font-mono font-bold bg-black text-white px-2">BF ~ 2-4</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-black border-t border-zinc-800 py-12 text-center">
+        <p class="text-gray-600 font-mono text-xs">
+            BASED ON THE PAPER BY GEORGE HUXCLEY (2026).<br>
+            "THE 3I/ATLAS PARADOX: BAYESIAN ANALYSIS OF NON-GRAVITATIONAL ACCELERATION"
+        </p>
+    </footer>
+
+
+
+</body>
+
+
+</html>
